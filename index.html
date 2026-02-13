@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Таня 💖</title>
+
 <style>
 body {
     margin: 0;
@@ -14,14 +15,13 @@ body {
 }
 
 .container {
-    margin-top: 15%;
+    margin-top: 20%;
     position: relative;
 }
 
 h1 {
-    font-size: 36px;
+    font-size: 34px;
     color: #ff4f9a;
-    text-shadow: 1px 1px 6px white;
 }
 
 button {
@@ -31,38 +31,39 @@ button {
     border: none;
     border-radius: 30px;
     cursor: pointer;
-    transition: 0.3s;
+    transition: 0.25s ease;
 }
 
 .yes {
-    background-color: #ff4f9a;
+    background: #ff4f9a;
     color: white;
 }
 
 .no {
-    background-color: white;
+    background: white;
     color: #ff4f9a;
-    position: fixed;
+    position: relative;
 }
 
 button:hover {
     transform: scale(1.1);
 }
 
+/* Сердечки */
 .hearts {
     position: fixed;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
     pointer-events: none;
+    top: 0;
+    left: 0;
 }
 
 .heart {
     position: absolute;
-    font-size: 22px;
+    font-size: 20px;
     animation: float 8s linear infinite;
-    opacity: 0.7;
+    opacity: 0.8;
 }
 
 @keyframes float {
@@ -84,29 +85,95 @@ button:hover {
 
 <script>
 
-// 💗 Милый звук через Web Audio (работает всегда)
-function playCuteSound() {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
+// 🎵 НАДЁЖНЫЙ ЗВУК (через встроенный mp3 base64)
+const cuteSound = new Audio("data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAA..."); 
+// ⚠️ GitHub может обрезать длинный base64.
+// Поэтому используем простой короткий beep через AudioContext,
+// но сначала активируем его.
 
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
+let audioCtx = null;
 
-    oscillator.type = "sine";
-    oscillator.frequency.setValueAtTime(660, audioCtx.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.3);
-
-    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
-
-    oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.5);
+function initAudio() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
 }
 
-// 🏃 Кнопка убегает, но остаётся в пределах экрана
-const noBtn = document.getElementById("noBtn");
-let moveCount = 0;
+function playCuteSound() {
+    initAudio();
+    const oscillator = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
 
-noBtn.addEventListener("mouseover", () => {
-    if (moveCount >= 7) retur
+    oscillator.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    oscillator.type = "triangle";
+    oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
+    oscillator.frequency.linearRampToValueAtTime(900, audioCtx.currentTime + 0.25);
+
+    gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 0.4);
+}
+
+// активируем аудио при любом первом касании
+document.body.addEventListener("click", initAudio, { once: true });
+
+
+// 🏃 ПЛАВНОЕ УБЕГАНИЕ С НЕБОЛЬШИМ РАДИУСОМ
+const noBtn = document.getElementById("noBtn");
+let moves = 0;
+
+noBtn.addEventListener("mouseenter", () => {
+
+    if (moves >= 8) return; // потом можно поймать
+    moves++;
+
+    const radius = 120; // маленький радиус движения
+
+    const offsetX = (Math.random() - 0.5) * radius;
+    const offsetY = (Math.random() - 0.5) * radius;
+
+    noBtn.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+});
+
+
+// 💖 СТРАНИЦА "ДА"
+function yesPage() {
+    playCuteSound();
+
+    document.body.innerHTML = `
+        <div class="container">
+            <h1>Таня, я тебя очень люблю, моя валентиночка! 💕🐝</h1>
+        </div>
+        <div class="hearts" id="hearts"></div>
+    `;
+
+    startHearts(true);
+}
+
+
+// 💗 Сердечки
+function startHearts(withBees=false) {
+    const container = document.getElementById("hearts");
+
+    setInterval(() => {
+        const el = document.createElement("div");
+        el.classList.add("heart");
+        el.style.left = Math.random() * 100 + "vw";
+        el.style.animationDuration = (5 + Math.random()*3) + "s";
+        el.innerText = withBees && Math.random() > 0.75 ? "🐝" : "💖";
+        container.appendChild(el);
+
+        setTimeout(() => el.remove(), 8000);
+    }, 500);
+}
+
+startHearts();
+
+</script>
+
+</body>
+</html>
