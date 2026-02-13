@@ -3,24 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <title>Таня 💖</title>
-
 <style>
 body {
     margin: 0;
     padding: 0;
     font-family: 'Comic Sans MS', cursive;
     text-align: center;
-    background: linear-gradient(135deg, #ffeaf4, #ffd6e7);
+    background: linear-gradient(135deg, #ffd6e7, #ffeaf4);
     overflow: hidden;
 }
 
 .container {
-    margin-top: 20%;
+    margin-top: 15%;
+    position: relative;
 }
 
 h1 {
-    font-size: 34px;
+    font-size: 38px;
     color: #ff4f9a;
+    text-shadow: 1px 1px 4px white;
 }
 
 button {
@@ -30,129 +31,109 @@ button {
     border: none;
     border-radius: 30px;
     cursor: pointer;
-    transition: 0.25s ease;
+    transition: 0.3s;
+    position: relative;
 }
 
 .yes {
-    background: #ff4f9a;
+    background-color: #ff4f9a;
     color: white;
 }
 
 .no {
-    background: white;
+    background-color: white;
     color: #ff4f9a;
-    position: relative;
+    position: absolute;
 }
 
 button:hover {
     transform: scale(1.1);
 }
 
-/* Сердечки */
 .hearts {
     position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     pointer-events: none;
-    top: 0;
-    left: 0;
 }
 
 .heart {
     position: absolute;
-    font-size: 20px;
-    animation: float 8s linear infinite;
+    font-size: 22px;
+    animation: float 7s linear infinite;
     opacity: 0.8;
 }
 
 @keyframes float {
-    0% { transform: translateY(100vh); }
-    100% { transform: translateY(-10vh); }
+    0% { transform: translateY(100vh) scale(1); }
+    100% { transform: translateY(-10vh) scale(1.3); }
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="container" id="main">
     <h1>Таня, будешь ли ты моей валентинкой? 💌🐝</h1>
-    <button class="yes" id="yesBtn">Да 💖</button>
+    <button class="yes" onclick="yesPage()">Да 💖</button>
     <button class="no" id="noBtn">Нет 😏</button>
 </div>
 
 <div class="hearts" id="hearts"></div>
 
+<audio id="cuteSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3"></audio>
+
 <script>
 
-// 🎵 Надёжный звук
-let audioCtx;
-
-function playCuteSound() {
-    if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-
-    osc.type = "triangle";
-    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-    osc.frequency.linearRampToValueAtTime(900, audioCtx.currentTime + 0.25);
-
-    gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
-
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.4);
-}
-
-// 🏃 Плавное движение кнопки "Нет"
 const noBtn = document.getElementById("noBtn");
-let moves = 0;
+let moveCount = 0;
 
-noBtn.addEventListener("mouseenter", () => {
-    if (moves >= 8) return;
-    moves++;
+noBtn.addEventListener("mouseover", () => {
+    moveCount++;
+    const maxX = window.innerWidth - noBtn.offsetWidth;
+    const maxY = window.innerHeight - noBtn.offsetHeight;
 
-    const radius = 120;
+    const randomX = Math.random() * maxX;
+    const randomY = Math.random() * maxY;
 
-    const x = (Math.random() - 0.5) * radius;
-    const y = (Math.random() - 0.5) * radius;
+    noBtn.style.left = randomX + "px";
+    noBtn.style.top = randomY + "px";
 
-    noBtn.style.transform = `translate(${x}px, ${y}px)`;
+    // После 6 попыток кнопка перестаёт убегать
+    if (moveCount > 6) {
+        noBtn.removeEventListener("mouseover", arguments.callee);
+    }
 });
 
-// 💖 Обработка "Да"
-document.getElementById("yesBtn").addEventListener("click", () => {
-    playCuteSound();
+function yesPage() {
+    document.getElementById("cuteSound").play();
 
     document.body.innerHTML = `
-        <div class="container">
-            <h1>Таня, я тебя очень люблю, моя валентиночка! 💕🐝</h1>
-        </div>
-        <div class="hearts" id="hearts"></div>
+    <div class="container">
+        <h1>Таня, я тебя очень люблю, моя валентиночка! 💕🐝</h1>
+    </div>
+    <div class="hearts" id="hearts"></div>
     `;
 
     startHearts(true);
-});
+}
 
-// 💗 Сердечки
 function startHearts(withBees=false) {
-    const container = document.getElementById("hearts");
-
+    const heartsContainer = document.getElementById("hearts");
     setInterval(() => {
-        const el = document.createElement("div");
-        el.classList.add("heart");
-        el.style.left = Math.random() * 100 + "vw";
-        el.style.animationDuration = (5 + Math.random()*3) + "s";
-        el.innerText = withBees && Math.random() > 0.75 ? "🐝" : "💖";
-        container.appendChild(el);
+        const heart = document.createElement("div");
+        heart.classList.add("heart");
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.animationDuration = (Math.random() * 3 + 4) + "s";
+        heart.innerText = withBees && Math.random() > 0.7 ? "🐝" : "💖";
+        heartsContainer.appendChild(heart);
 
-        setTimeout(() => el.remove(), 8000);
-    }, 500);
+        setTimeout(() => {
+            heart.remove();
+        }, 7000);
+    }, 400);
 }
 
 startHearts();
