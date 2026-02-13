@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Таня 💖</title>
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Comic Sans MS', cursive;
+    text-align: center;
+    background: linear-gradient(135deg, #ffeaf4, #ffd6e7);
+    overflow: hidden;
+}
+
+.container {
+    margin-top: 15%;
+    position: relative;
+}
+
+h1 {
+    font-size: 36px;
+    color: #ff4f9a;
+    text-shadow: 1px 1px 6px white;
+}
+
+button {
+    padding: 15px 30px;
+    font-size: 20px;
+    margin: 15px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.yes {
+    background-color: #ff4f9a;
+    color: white;
+}
+
+.no {
+    background-color: white;
+    color: #ff4f9a;
+    position: fixed;
+}
+
+button:hover {
+    transform: scale(1.1);
+}
+
+.hearts {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.heart {
+    position: absolute;
+    font-size: 22px;
+    animation: float 8s linear infinite;
+    opacity: 0.7;
+}
+
+@keyframes float {
+    0% { transform: translateY(100vh); }
+    100% { transform: translateY(-10vh); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Таня, будешь ли ты моей валентинкой? 💌🐝</h1>
+    <button class="yes" onclick="yesPage()">Да 💖</button>
+    <button class="no" id="noBtn">Нет 😏</button>
+</div>
+
+<div class="hearts" id="hearts"></div>
+
+<script>
+
+// 💗 Милый звук через Web Audio (работает всегда)
+function playCuteSound() {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(660, audioCtx.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.3);
+
+    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 0.5);
+}
+
+// 🏃 Кнопка убегает, но остаётся в пределах экрана
+const noBtn = document.getElementById("noBtn");
+let moveCount = 0;
+
+noBtn.addEventListener("mouseover", () => {
+    if (moveCount >= 7) return;
+
+    moveCount++;
+
+    const maxX = window.innerWidth - noBtn.offsetWidth - 20;
+    const maxY = window.innerHeight - noBtn.offsetHeight - 20;
+
+    const randomX = Math.random() * maxX;
+    const randomY = Math.random() * maxY;
+
+    noBtn.style.left = randomX + "px";
+    noBtn.style.top = randomY + "px";
+});
+
+function yesPage() {
+    playCuteSound();
+
+    document.body.innerHTML = `
+    <div class="container">
+        <h1>Таня, я тебя очень люблю, моя валентиночка! 💕🐝</h1>
+    </div>
+    <div class="hearts" id="hearts"></div>
+    `;
+
+    startHearts(true);
+}
+
+// 💖 Сердечки и пчёлки
+function startHearts(withBees=false) {
+    const heartsContainer = document.getElementById("hearts");
+    setInterval(() => {
+        const heart = document.createElement("div");
+        heart.classList.add("heart");
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.animationDuration = (Math.random() * 3 + 5) + "s";
+        heart.innerText = withBees && Math.random() > 0.75 ? "🐝" : "💖";
+        heartsContainer.appendChild(heart);
+
+        setTimeout(() => {
+            heart.remove();
+        }, 8000);
+    }, 500);
+}
+
+startHearts();
+
+</script>
+
+</body>
+</html>
