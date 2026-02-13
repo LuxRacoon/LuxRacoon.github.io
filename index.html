@@ -14,7 +14,7 @@ body {
 }
 
 .container {
-    margin-top: 15%;
+    margin-top: 8%;
     position: relative;
 }
 
@@ -22,6 +22,16 @@ h1 {
     font-size: 38px;
     color: #ff4f9a;
     text-shadow: 1px 1px 4px white;
+}
+
+.photo {
+    margin: 20px auto;
+}
+
+.photo img {
+    width: 280px;
+    border-radius: 20px;
+    box-shadow: 0 0 15px rgba(255, 79, 154, 0.5);
 }
 
 button {
@@ -77,6 +87,11 @@ button:hover {
 
 <div class="container" id="main">
     <h1>Таня, будешь ли ты моей валентинкой? 💌🐝</h1>
+
+    <div class="photo">
+        <img src="photo_2026-02-13_21-16-40.jpg" alt="Мы">
+    </div>
+
     <button class="yes" onclick="yesPage()">Да 💖</button>
     <button class="no" id="noBtn">Нет 😏</button>
 </div>
@@ -88,23 +103,17 @@ button:hover {
 <script>
 
 const noBtn = document.getElementById("noBtn");
-let moveCount = 0;
 
-noBtn.addEventListener("mouseover", () => {
-    moveCount++;
+noBtn.addEventListener("mouseenter", () => {
     const maxX = window.innerWidth - noBtn.offsetWidth;
     const maxY = window.innerHeight - noBtn.offsetHeight;
 
     const randomX = Math.random() * maxX;
     const randomY = Math.random() * maxY;
 
+    noBtn.style.position = "fixed";
     noBtn.style.left = randomX + "px";
     noBtn.style.top = randomY + "px";
-
-    // После 6 попыток кнопка перестаёт убегать
-    if (moveCount > 6) {
-        noBtn.removeEventListener("mouseover", arguments.callee);
-    }
 });
 
 function yesPage() {
